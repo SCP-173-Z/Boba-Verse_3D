@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="UAS.vcxproj" Id="0eb88d1d-224e-4d90-ac31-5655a315c81d" />
+</Solution>
