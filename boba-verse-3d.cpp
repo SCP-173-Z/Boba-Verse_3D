@@ -47,6 +47,8 @@ Theme themes[THEME_COUNT] = {
     themes[0]
 };
 
+bool isWireframe = false;
+
 int winWidth = 1080;
 int winHeight = 680;
 
@@ -80,6 +82,137 @@ void drawFloorPlatform() {
     glPopMatrix();
 }
 
+void drawBobaCup() {
+    const Theme& t = themes[currentTheme];
+
+    glPushMatrix();
+    glTranslatef(0.0f, -0.52f, 0.0f);
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glColor3f(t.bobaLid.r, t.bobaLid.g, t.bobaLid.b);
+    glutSolidTorus(0.06, 0.23, 16, 28);
+    glPopMatrix();
+
+    const float pearlPos[9][3] = {
+        { -0.11f, -0.26f,  0.08f },
+        {  0.10f, -0.27f,  0.07f },
+        {  0.00f, -0.28f, -0.10f },
+        { -0.04f, -0.18f,  0.13f },
+        {  0.13f, -0.16f, -0.05f },
+        { -0.13f, -0.14f, -0.06f },
+        {  0.02f, -0.10f,  0.03f },
+        { -0.07f, -0.34f, -0.01f },
+        {  0.07f, -0.34f,  0.02f }
+    };
+    glColor3f(0.08f, 0.05f, 0.09f);
+    for (int i = 0; i < 9; i++) {
+        glPushMatrix();
+        glTranslatef(pearlPos[i][0], pearlPos[i][1], pearlPos[i][2]);
+        glutSolidSphere(0.065, 14, 14);
+        glPopMatrix();
+    }
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.42f, 0.0f);
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glColor3f(t.bobaLid.r, t.bobaLid.g, t.bobaLid.b);
+    glutSolidTorus(0.045, 0.41, 16, 32);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.43f, 0.0f);
+    glScalef(1.0f, 0.36f, 1.0f);
+    glColor3f(t.bobaLid.r, t.bobaLid.g, t.bobaLid.b);
+    glutSolidSphere(0.40, 24, 16);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.10f, 0.56f, 0.02f);
+    glRotatef(-16.0f, 0.0f, 0.0f, 1.0f);
+    glScalef(0.065f, 0.78f, 0.065f);
+    glColor3f(t.bobaStraw.r, t.bobaStraw.g, t.bobaStraw.b);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    if (!isWireframe) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(GL_FALSE);
+        glColor4f(t.bobaCup.r, t.bobaCup.g, t.bobaCup.b, 0.62f);
+    }
+    else {
+        glColor3f(t.bobaCup.r, t.bobaCup.g, t.bobaCup.b);
+    }
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.42f, 0.0f);
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glutSolidCone(0.41, 1.00, 28, 12);
+    glPopMatrix();
+
+    if (!isWireframe) {
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+    }
+}
+
+void drawBitmapText(float x, float y, const char* text, void* font) {
+    glRasterPos2f(x, y);
+    for (int i = 0; text[i] != '\0'; i++) {
+        glutBitmapCharacter(font, text[i]);
+    }
+}
+
+void drawTextOverlay() {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0, winWidth, 0, winHeight, -1, 1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(0.05f, 0.03f, 0.12f, 0.65f);
+
+    glBegin(GL_QUADS);
+    glVertex2f(14.0f, (float)winHeight - 14.0f);
+    glVertex2f(370.0f, (float)winHeight - 14.0f);
+    glVertex2f(370.0f, (float)winHeight - 72.0f);
+    glVertex2f(14.0f, (float)winHeight - 72.0f);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(14.0f, 14.0f);
+    glVertex2f((float)winWidth - 14.0f, 14.0f);
+    glVertex2f((float)winWidth - 14.0f, 48.0f);
+    glVertex2f(14.0f, 48.0f);
+    glEnd();
+    glDisable(GL_BLEND);
+
+    glColor3f(1.0f, 0.72f, 0.92f);
+    drawBitmapText(26.0f, (float)winHeight - 36.0f, "BOBA-VERSE 3D  //  Y2K PASTEL STUDIO", GLUT_BITMAP_HELVETICA_18);
+
+    glColor3f(0.95f, 0.95f, 1.0f);
+    drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + 3D Boba Cup", GLUT_BITMAP_HELVETICA_12);
+
+    glColor3f(0.92f, 0.86f, 1.0f);
+    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup (Model Awal)", GLUT_BITMAP_HELVETICA_12);
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -95,6 +228,15 @@ void display() {
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
     drawFloorPlatform();
+
+    glPushMatrix();
+    glTranslatef(-1.85f, 0.05f, 0.0f);
+    glRotatef(12.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(-18.0f, 0.0f, 1.0f, 0.0f);
+    drawBobaCup();
+    glPopMatrix();
+
+    drawTextOverlay();
 
     glutSwapBuffers();
 }
