@@ -155,6 +155,53 @@ void drawBobaCup() {
     }
 }
 
+void drawDonut() {
+    const Theme& t = themes[currentTheme];
+
+    glPushMatrix();
+    glColor3f(t.donutDough.r, t.donutDough.g, t.donutDough.b);
+    glutSolidTorus(0.17, 0.36, 22, 36);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.035f);
+    glColor3f(t.donutGlaze.r, t.donutGlaze.g, t.donutGlaze.b);
+    glutSolidTorus(0.155, 0.36, 20, 36);
+    glPopMatrix();
+
+    const float sprinkleAngles[10] = {
+        0.0f, 36.0f, 72.0f, 108.0f, 144.0f,
+        180.0f, 216.0f, 252.0f, 288.0f, 324.0f
+    };
+    const float sprinkleColors[5][3] = {
+        {1.0f, 0.95f, 0.45f},
+        {0.45f, 0.96f, 1.0f},
+        {0.98f, 0.98f, 1.0f},
+        {0.62f, 1.0f, 0.72f},
+        {0.82f, 0.55f, 1.0f}
+    };
+
+    for (int i = 0; i < 10; i++) {
+        float rad = sprinkleAngles[i] * 3.14159265f / 180.0f;
+        float radiusRing = (i % 2 == 0) ? 0.38f : 0.33f;
+        float sx = std::cos(rad) * radiusRing;
+        float sy = std::sin(rad) * radiusRing;
+
+        glPushMatrix();
+        glTranslatef(sx, sy, 0.185f);
+        glRotatef(sprinkleAngles[i] + 35.0f, 0.0f, 0.0f, 1.0f);
+        glColor3f(sprinkleColors[i % 5][0], sprinkleColors[i % 5][1], sprinkleColors[i % 5][2]);
+        if (i % 2 == 0) {
+            glScalef(0.08f, 0.03f, 0.03f);
+            glutSolidCube(1.0);
+        }
+        else {
+            glutSolidSphere(0.028, 10, 10);
+        }
+        glPopMatrix();
+    }
+}
+
 void drawBitmapText(float x, float y, const char* text, void* font) {
     glRasterPos2f(x, y);
     for (int i = 0; text[i] != '\0'; i++) {
@@ -199,10 +246,10 @@ void drawTextOverlay() {
     drawBitmapText(26.0f, (float)winHeight - 36.0f, "BOBA-VERSE 3D  //  Y2K PASTEL STUDIO", GLUT_BITMAP_HELVETICA_18);
 
     glColor3f(0.95f, 0.95f, 1.0f);
-    drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + 3D Boba Cup", GLUT_BITMAP_HELVETICA_12);
+    drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + Boba Cup + Donut", GLUT_BITMAP_HELVETICA_12);
 
     glColor3f(0.92f, 0.86f, 1.0f);
-    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup (Model Awal)", GLUT_BITMAP_HELVETICA_12);
+    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup & Donut", GLUT_BITMAP_HELVETICA_12);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -234,6 +281,13 @@ void display() {
     glRotatef(12.0f, 1.0f, 0.0f, 0.0f);
     glRotatef(-18.0f, 0.0f, 1.0f, 0.0f);
     drawBobaCup();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.05f, 0.0f);
+    glRotatef(25.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(10.0f, 0.0f, 1.0f, 0.0f);
+    drawDonut();
     glPopMatrix();
 
     drawTextOverlay();
