@@ -202,6 +202,70 @@ void drawDonut() {
     }
 }
 
+void drawRetroConsole() {
+    const Theme& t = themes[currentTheme];
+
+    glPushMatrix();
+    glScalef(0.86f, 0.94f, 0.58f);
+    glColor3f(t.consoleBody.r, t.consoleBody.g, t.consoleBody.b);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.16f, 0.295f);
+    glScalef(0.66f, 0.42f, 0.04f);
+    glColor3f(0.10f, 0.07f, 0.20f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.0f, 0.16f, 0.318f);
+    glScalef(0.54f, 0.32f, 0.02f);
+    glColor3f(0.45f, 1.00f, 0.88f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glColor3f(t.consoleAccent.r, t.consoleAccent.g, t.consoleAccent.b);
+    glPushMatrix();
+    glTranslatef(-0.20f, -0.22f, 0.305f);
+    glScalef(0.18f, 0.06f, 0.05f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-0.20f, -0.22f, 0.305f);
+    glScalef(0.06f, 0.18f, 0.05f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.14f, -0.25f, 0.305f);
+    glScalef(0.08f, 0.08f, 0.05f);
+    glColor3f(1.0f, 0.45f, 0.78f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.25f, -0.18f, 0.305f);
+    glScalef(0.08f, 0.08f, 0.05f);
+    glColor3f(1.0f, 0.90f, 0.42f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.28f, 0.56f, -0.05f);
+    glScalef(0.05f, 0.24f, 0.05f);
+    glColor3f(t.consoleAccent.r, t.consoleAccent.g, t.consoleAccent.b);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.28f, 0.70f, -0.05f);
+    glColor3f(1.0f, 0.55f, 0.85f);
+    glutSolidSphere(0.055, 12, 12);
+    glPopMatrix();
+}
+
 void drawBitmapText(float x, float y, const char* text, void* font) {
     glRasterPos2f(x, y);
     for (int i = 0; text[i] != '\0'; i++) {
@@ -229,8 +293,8 @@ void drawTextOverlay() {
 
     glBegin(GL_QUADS);
     glVertex2f(14.0f, (float)winHeight - 14.0f);
-    glVertex2f(370.0f, (float)winHeight - 14.0f);
-    glVertex2f(370.0f, (float)winHeight - 72.0f);
+    glVertex2f(420.0f, (float)winHeight - 14.0f);
+    glVertex2f(420.0f, (float)winHeight - 72.0f);
     glVertex2f(14.0f, (float)winHeight - 72.0f);
     glEnd();
 
@@ -246,10 +310,10 @@ void drawTextOverlay() {
     drawBitmapText(26.0f, (float)winHeight - 36.0f, "BOBA-VERSE 3D  //  Y2K PASTEL STUDIO", GLUT_BITMAP_HELVETICA_18);
 
     glColor3f(0.95f, 0.95f, 1.0f);
-    drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + Boba Cup + Donut", GLUT_BITMAP_HELVETICA_12);
+    drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + Boba Cup + Donut + Retro Console", GLUT_BITMAP_HELVETICA_12);
 
     glColor3f(0.92f, 0.86f, 1.0f);
-    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup & Donut", GLUT_BITMAP_HELVETICA_12);
+    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup, Donut, & Retro Cube Console", GLUT_BITMAP_HELVETICA_12);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -288,6 +352,13 @@ void display() {
     glRotatef(25.0f, 1.0f, 0.0f, 0.0f);
     glRotatef(10.0f, 0.0f, 1.0f, 0.0f);
     drawDonut();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(1.85f, 0.05f, 0.0f);
+    glRotatef(10.0f, 1.0f, 0.0f, 0.0f);
+    glRotatef(-25.0f, 0.0f, 1.0f, 0.0f);
+    drawRetroConsole();
     glPopMatrix();
 
     drawTextOverlay();
