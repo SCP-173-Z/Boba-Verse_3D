@@ -4,6 +4,12 @@
 #include <cstdio>
 #include <cstdlib>
 
+struct ObjectState {
+    float x, y, z;
+    float rx, ry, rz;
+    float scale;
+};
+
 struct Color3 {
     float r, g, b;
 };
@@ -23,6 +29,14 @@ struct Theme {
     Color3 consoleAccent;
     Color3 indicatorColor;
 };
+
+ObjectState objects[3] = {
+    //  {      x,     y,    z,     rx,     ry,   rz, scale}
+        { -1.85f, 0.05f, 0.0f,  12.0f, -18.0f, 0.0f,  1.0f}, // Boba Cup
+        {  0.00f, 0.05f, 0.0f,  25.0f,  10.0f, 0.0f,  1.0f}, // Donut
+        {  1.85f, 0.05f, 0.0f,  10.0f, -25.0f, 0.0f,  1.0f}  // Retro Console
+};
+int activeObject = -1;
 
 int currentTheme = 0;
 const int THEME_COUNT = 3;
@@ -266,6 +280,20 @@ void drawRetroConsole() {
     glPopMatrix();
 }
 
+void drawActiveMarker() {
+    const Theme& t = themes[currentTheme];
+
+    glDisable(GL_LIGHTING);
+    glColor3f(t.indicatorColor.r, t.indicatorColor.g, t.indicatorColor.b);
+
+    glPushMatrix();
+    glScalef(1.18f, 1.18f, 1.18f);
+    glutWireCube(1.05);
+    glPopMatrix();
+
+    glEnable(GL_LIGHTING);
+}
+
 void drawBitmapText(float x, float y, const char* text, void* font) {
     glRasterPos2f(x, y);
     for (int i = 0; text[i] != '\0'; i++) {
@@ -301,8 +329,8 @@ void drawTextOverlay() {
     glBegin(GL_QUADS);
     glVertex2f(14.0f, 14.0f);
     glVertex2f((float)winWidth - 14.0f, 14.0f);
-    glVertex2f((float)winWidth - 14.0f, 48.0f);
-    glVertex2f(14.0f, 48.0f);
+    glVertex2f((float)winWidth - 14.0f, 72.0f);
+    glVertex2f(14.0f, 72.0f);
     glEnd();
     glDisable(GL_BLEND);
 
@@ -312,8 +340,34 @@ void drawTextOverlay() {
     glColor3f(0.95f, 0.95f, 1.0f);
     drawBitmapText(26.0f, (float)winHeight - 58.0f, "Scene : Floor Grid + Boba Cup + Donut + Retro Console", GLUT_BITMAP_HELVETICA_12);
 
+    const char* activeLabel = "None";
+    switch (activeObject) {
+    case 0:
+        activeLabel = "All Objects";
+        break;
+    case 1:
+        activeLabel = "Boba Cup";
+        break;
+    case 2:
+        activeLabel = "Donut";
+        break;
+    case 3:
+        activeLabel = "Retro Game Console";
+        break;
+    default:
+        activeLabel = "None";
+    }
+    char currentObject[128];
+    strcpy_s(currentObject, "Objek 3D: ");
+    strcat_s(currentObject, activeLabel);
+
     glColor3f(0.92f, 0.86f, 1.0f);
-    drawBitmapText(26.0f, 27.0f, "Objek 3D: Boba Cup, Donut, & Retro Cube Console", GLUT_BITMAP_HELVETICA_12);
+    drawBitmapText(26.0f, 48.0f, currentObject, GLUT_BITMAP_HELVETICA_12);
+
+    glColor3f(0.92f, 0.86f, 1.0f);
+    drawBitmapText(26.0f, 27.0f,
+        "Controls: 1/2/3 - Select object, P - Select all objects, 0 - Unselect",
+        GLUT_BITMAP_HELVETICA_12);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -340,26 +394,25 @@ void display() {
 
     drawFloorPlatform();
 
-    glPushMatrix();
-    glTranslatef(-1.85f, 0.05f, 0.0f);
-    glRotatef(12.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(-18.0f, 0.0f, 1.0f, 0.0f);
-    drawBobaCup();
-    glPopMatrix();
+    for (int i = 0; i < 3; i++) {
+        bool isActive = activeObject == 0 || activeObject == i + 1;
 
-    glPushMatrix();
-    glTranslatef(0.0f, 0.05f, 0.0f);
-    glRotatef(25.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(10.0f, 0.0f, 1.0f, 0.0f);
-    drawDonut();
-    glPopMatrix();
+        glPushMatrix();
+        glTranslatef(objects[i].x, objects[i].y, objects[i].z);
 
-    glPushMatrix();
-    glTranslatef(1.85f, 0.05f, 0.0f);
-    glRotatef(10.0f, 1.0f, 0.0f, 0.0f);
-    glRotatef(-25.0f, 0.0f, 1.0f, 0.0f);
-    drawRetroConsole();
-    glPopMatrix();
+        glRotatef(objects[i].rx, 1.0f, 0.0f, 0.0f);
+        glRotatef(objects[i].ry, 0.0f, 1.0f, 0.0f);
+        glRotatef(objects[i].rz, 0.0f, 0.0f, 1.0f);
+
+        glScalef(objects[i].scale, objects[i].scale, objects[i].scale);
+
+        if (i == 0) drawBobaCup();
+        else if (i == 1) drawDonut();
+        else drawRetroConsole();
+
+        if (isActive) drawActiveMarker();
+        glPopMatrix();
+    }
 
     drawTextOverlay();
 
@@ -376,6 +429,33 @@ void reshape(int w, int h) {
     glLoadIdentity();
     gluPerspective(45.0, (double)w / (double)h, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
+}
+
+void keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+    case '0':
+        activeObject = -1;
+        break;
+    case '1':
+        activeObject = 1;
+        break;
+    case '2':
+        activeObject = 2;
+        break;
+    case '3':
+        activeObject = 3;
+        break;
+    case 'p':
+    case 'P':
+        activeObject = 0;
+        break;
+
+    case 27:
+        std::exit(0);
+        break;
+    }
+
+    glutPostRedisplay();
 }
 
 void initOpenGL() {
@@ -415,6 +495,7 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
 
     glutMainLoop();
     return 0;
